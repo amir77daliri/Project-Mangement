@@ -5,7 +5,7 @@ from project.models import Project
 from project.views import PROJECT_LIST_CACHE_KEY
 
 
-class TestProjectView(TestCase):
+class TestProjectViews(TestCase):
 
     def setUp(self):
         self.client = APIClient()

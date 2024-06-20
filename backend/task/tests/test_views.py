@@ -9,7 +9,7 @@ from unittest.mock import patch
 from datetime import datetime, timedelta
 
 
-class TestProjectView(TestCase):
+class TestTaskViews(TestCase):
 
     def setUp(self):
         self.client = APIClient()
@@ -121,3 +121,41 @@ class TestProjectView(TestCase):
             Task.objects.get(id=task_1.id)
         # check for invalidating cache :
         self.assertIsNone(cache.get(Task_LIST_CACHE_KEY))
+
+
+class TestCommentViews(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.project = Project.objects.create(name='project 1')
+        self.task = Task.objects.create(
+            title='task_1',
+            description='test task_1',
+            project=self.project,
+            due_date=make_aware(datetime.now() + timedelta(days=1))
+        )
+        self.comment_1 = Comment.objects.create(task=self.task, author='amir', content='first comment for task 1')
+        self.comment_2 = Comment.objects.create(task=self.task, author='amir', content='second comment for task 1')
+
+    def test_comment_list_retrieve(self):
+        response = self.client.get(f'/api/v1/tasks/{self.task.id}/comments/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['author'], 'amir')
+        self.assertEqual(response.data[1]['content'], 'second comment for task 1')
+
+    def test_comment_create_successfully(self):
+        comment_data = {
+            'author': 'reza',
+            'content': 'new comment for task 1'
+        }
+
+        response = self.client.post(f'/api/v1/tasks/{self.task.id}/comments/', comment_data, format='json')
+
+        self.assertEqual(response.status_code, 201)
+        # check a new comment added to task 1 comments:
+        self.assertEqual(self.task.comments.all().count(), 3)
+        # check comment save success:
+        self.assertEqual(Comment.objects.last().author, comment_data['author'])
+

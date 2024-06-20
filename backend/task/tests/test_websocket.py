@@ -18,7 +18,6 @@ class TestTaskNotificationConsumer(TestCase):
 
         # Check if the consumer receives and responds correctly
         response = await communicator.receive_json_from()
-        print(response)
         self.assertEqual(response, {'msg': 'i am django framework'})
 
         # Disconnect from the consumer
