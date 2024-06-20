@@ -47,7 +47,7 @@ class TestProjectViews(TestCase):
         data = {
             'name': 'update_prj_1'
         }
-        response = self.client.put(f"/api/v1/projects/{project.id}", data, format='json')
+        self.client.put(f"/api/v1/projects/{project.id}", data, format='json')
         updated_project = Project.objects.get(id=project.id)
 
         self.assertEqual(updated_project.name, 'update_prj_1')

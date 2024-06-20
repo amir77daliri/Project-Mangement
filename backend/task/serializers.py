@@ -3,9 +3,6 @@ from .models import Task, Comment
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    description = serializers.CharField(required=False)
-    created_at = serializers.DateTimeField(read_only=True)
-    updated_at = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Task
