@@ -1,19 +1,17 @@
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import sync_to_async
 from django.test import TestCase
 from channels.testing import WebsocketCommunicator
 from task.consumer import TaskNotificationConsumer
 from task.models import Task, Comment
-from unittest.mock import patch
 from project.models import Project
 from rest_framework.test import APIClient
 from django.utils.timezone import make_aware
 from datetime import datetime, timedelta
 from django.core.cache import cache
-import json
-
 
 
 class TestTaskNotificationConsumer(TestCase):
+
     def setUp(self):
         self.client = APIClient()
         cache.clear()
