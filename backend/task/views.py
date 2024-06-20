@@ -33,9 +33,7 @@ def send_notification(message):
 
 class TaskListCreateApiView(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
-
-    def get_queryset(self):
-        return Task.objects.all()
+    queryset = Task.objects.all()
 
     def get(self, request, *args, **kwargs):
         task_list = cache.get(Task_LIST_CACHE_KEY)
