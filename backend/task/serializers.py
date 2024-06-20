@@ -21,7 +21,6 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('author', 'content', 'task', 'created_at')
 
     def create(self, validated_data):
-        print(self.context)
         task = self.context['task']
         content = validated_data['content']
         author = validated_data['author']
