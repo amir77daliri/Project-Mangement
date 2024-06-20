@@ -1,10 +1,11 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from rest_framework import generics, status
 from rest_framework.response import Response
 from .serializers import TaskSerializer, CommentSerializer
 from .models import Task, Comment
 from django.core.cache import cache
-from django.shortcuts import render
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 
 Task_LIST_CACHE_KEY = 'task_list'
@@ -17,6 +18,17 @@ def index_ws(request):
 def room(request, room_name):
     print(room_name)
     return render(request, "task/room.html", {"room_name": room_name})
+
+
+def send_notification(message):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'task_notification',
+        {
+            'type': 'notify_task_changes',
+            'data': message
+        }
+    )
 
 
 class TaskListCreateApiView(generics.ListCreateAPIView):
@@ -45,6 +57,13 @@ class TaskListCreateApiView(generics.ListCreateAPIView):
         ser_data.save()
         # invalidate cache
         cache.delete(Task_LIST_CACHE_KEY)
+
+        # send notification to clients :
+        try:
+            send_notification('A new task created !')
+        except Exception as e:
+            print(e)
+
         return Response(ser_data.data, status=status.HTTP_201_CREATED)
 
 
@@ -56,12 +75,25 @@ class TaskRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
         response = super().update(request, *args, **kwargs)
         # invalidation cache :
         cache.delete(Task_LIST_CACHE_KEY)
+        # send notify :
+        try:
+            send_notification(f"the task {response.data['title']} updated!")
+        except Exception as e:
+            print(e)
+
         return response
 
     def delete(self, request, *args, **kwargs):
         response = super().delete(request, *args, **kwargs)
         # invalidation cache :
         cache.delete(Task_LIST_CACHE_KEY)
+
+        # send notify :
+        try:
+            send_notification(f"the task by id= {self.kwargs['pk']} deleted!")
+        except Exception as e:
+            print(e)
+
         return response
 
 
@@ -79,4 +111,11 @@ class RetrieveTaskCommentsApiView(generics.ListCreateAPIView):
         ser = self.get_serializer(data=request.data, context={'task': task})
         ser.is_valid(raise_exception=True)
         ser.save()
+
+        # send notify :
+        try:
+            send_notification(f"comment Added for task {task}!")
+        except Exception as e:
+            print(e)
+
         return Response(ser.data, status=status.HTTP_201_CREATED)
