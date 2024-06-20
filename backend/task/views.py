@@ -4,9 +4,19 @@ from rest_framework.response import Response
 from .serializers import TaskSerializer, CommentSerializer
 from .models import Task, Comment
 from django.core.cache import cache
+from django.shortcuts import render
 
 
 Task_LIST_CACHE_KEY = 'task_list'
+
+
+def index_ws(request):
+    return render(request, 'task/index.html')
+
+
+def room(request, room_name):
+    print(room_name)
+    return render(request, "task/room.html", {"room_name": room_name})
 
 
 class TaskListCreateApiView(generics.ListCreateAPIView):
