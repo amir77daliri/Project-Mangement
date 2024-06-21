@@ -2,7 +2,6 @@
 
 ## project setup
 
-1- SetUp venv
 ```bash
 git clone https://github.com/amir77daliri/Project-Mangement.git
 $ cd Project-Mangement
