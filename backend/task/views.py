@@ -39,10 +39,12 @@ class TaskListCreateApiView(generics.ListCreateAPIView):
         task_list = cache.get(Task_LIST_CACHE_KEY)
         # check for cached data :
         if task_list is not None:
+            print("Get Tasks from cache...")
             return Response(task_list, status=status.HTTP_200_OK)
         # get from db and cache data
         queryset = self.get_queryset()
         data = self.serializer_class(queryset, many=True).data
+        print("Get Tasks from db...")
         cache.set(Task_LIST_CACHE_KEY, data)
         return Response(data, status=status.HTTP_200_OK)
 
