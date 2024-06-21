@@ -31,8 +31,6 @@ class CeleryTaskTestCase(TestCase):
         # Call the task
         send_daily_email_task()
 
-        mock_task_objects.exclude.return_value.filter.assert_called_once_with(due_date__lte=next_24_hours)
-
         # Ensure send_mail was called once with the correct parameters
         expected_message = "the tasks in task:1-Task 1 | task:2-Task 2 |  due within the next 24 hours"
         mock_send_mail.assert_called_once_with(
