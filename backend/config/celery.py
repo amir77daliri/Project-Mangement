@@ -22,4 +22,8 @@ celery_app.conf.beat_schedule = {
         'task': 'task.tasks.send_daily_email_task',
         'schedule': crontab(minute='0', hour='*/12'),  # Execute every 12 hours
     },
+    'send_daily_report': {
+        'task': 'project.tasks.send_daily_project_summary_report',
+        'schedule': crontab(minute='0', hour='1'),  # Execute at midnight
+    },
 }
