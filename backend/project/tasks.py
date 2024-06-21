@@ -22,7 +22,7 @@ def send_daily_project_summary_report():
             'in_progress_tasks': f'{project.in_progress_tasks_count}'
         }
 
-    subject = 'Reminder Tasks Email'
+    subject = 'Reminder Projects Email'
     message = json.dumps(data)
     from_email = "my_site@gmail.com"
     recipient_list = ['test@example.com']
